@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Rackspace Cloud Monitoring Dashboard"
-description: 
+excerpt: Members of Rackspace's MyCloud team spent a portion of a November hackweek building a dashboard for our Cloud Monitoring alarms.  The open source project can be easily deployed to Heroku and provides a clean, multi-account overview.
 date:   2015-01-02 14:31:25
 categories: 
 tags:  

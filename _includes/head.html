@@ -5,9 +5,9 @@
   <!-- (1) force latest IE rendering engine: bit.ly/1c8EiC9 -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
-  {% if page.description %}
-  <meta name="description" content="{{ page.description }}" />
+  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+  {% if page.excerpt %}
+  <meta name="description" content="{{ page.excerpt }}" />
   {% else %}
   <meta name="description" content="{{ site.description }}" />
   {% endif %}
