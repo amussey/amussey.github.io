@@ -34,6 +34,16 @@
       }
     });
   });
+  function stretchImages() {
+    $('img.stretch').each(function(i, obj) {
+        $(this).css("max-width", "none");
+        $(this).css("width", $("body").width());
+        var imageSize = -(($("body").width()-$("section.post-content").width())/2);
+        $(this).css("margin-left", imageSize + "px");
+    });
+  }
+  $(window).resize(stretchImages);
+  stretchImages();
 }(jQuery));
 </script>
 <script>

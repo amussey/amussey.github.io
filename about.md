@@ -4,14 +4,10 @@ title: About
 permalink: /about/
 ---
 
-A medium inspired Jekyll blog theme. The basic idea came from the Ghost theme 
-[Readium 2.0](http://www.svenread.com/readium-ghost-theme/). I use mediator on my own blog [The Base](blog.base68.com).
+I'm Andrew Mussey, a software developer at Rackspace in Blacksburg, VA. I've been writing code for more than 10 years, focusing mainly on web technologies. My knowledge-base spans the full software stack, covering both front-end and back-end development.
 
-You can **download** the theme here:
-[https://github.com/dirkfabisch/mediator](https://github.com/dirkfabisch/mediator) 
+On the side, I work as a freelance videographer for local startups, non-profits, and the standup comedy community. Notable clients include the coding group [Let's Code Blacksburg!](http://letscodeblacksburg.org/) and the [Smart Beginnings Reading Hour](http://www.smartbeginningsnrv.org/content/reading-hour). Previously, I worked with [Virginia Tech Television](http://www.vttv33.com/) producing the sketch comedy series [*The Sketch*](https://www.youtube.com/playlist?list=PLowl6PYoVZ0IXLIqHh9l-8UWUAqVQd9Z7).
 
-You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+I'm a 2013 Virginia Tech graduate with a bachelor's in Computer Science.
 
-You can find the source code for the Jekyll new theme at: [github.com/jglovier/jekyll-new](https://github.com/jglovier/jekyll-new)
-
-You can find the source code for Jekyll at [github.com/jekyll/jekyll](https://github.com/jekyll/jekyll)
+The [Jekyll](http://jekyllrb.com/) theme used on this blog is [Mediator](https://github.com/dirkfabisch/mediator), created by [@dirkfabisch](https://twitter.com/dirkfabisch).  More information on the cover photo is available [here](http://mancavephotography.tumblr.com/post/33362149409/the-underside-of-an-old-geforce-6600).
