@@ -1,11 +1,11 @@
 ---
 layout:     post
-title:      Updating the Firmware & BIOS on the LSI 9201-16i
+title:      Updating the Firmware on the LSI 9201-16i
 excerpt:    A step by step guide on how to update the firmware and BIOs on the LSI 9201-16i SAS controller.
 date:       2015-02-19 12:35:12
 categories: 
 tags:       SAS, RAID, LSI, Firmware, BIOs
-image:      /assets/articles/images/2015-02-19-updating-lsi-9201-16i/IMG_9941_darkened-2-2560.jpg
+image:      /assets/articles/images/2015-02-19-updating-LSI-9201-16i-firmware/IMG_9941_darkened-2-2560.jpg
 ---
 {% include attributes.md %}
 
