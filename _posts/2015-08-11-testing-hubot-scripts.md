@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Testing Hubot Scripts"
-excerpt:    Using Mocha, Sinon, Chai, and Nock, we can assemble a very reliable testing suite for custom hubot scripts.
+excerpt:    Using Mocha, Sinon, Chai, and Nock, we can assemble a very reliable testing suite for custom Hubot scripts.
 date:       2015-08-11 16:31:06
 categories:
 tags:       testing, tdd, hubot, scripting, coffeescript
@@ -11,18 +11,18 @@ image:      /assets/articles/images/2015-08-11-testing-hubot-scripts/cover.jpg
 
 The Cloud Control Panel team uses a fork of [Github's Hubot][hubot] for a large variety of tasks.  Everything from our deployment pipeline to cross team communication is integrated with with our customized version of the IRC bot.
 
-As the team's script codebase for Hubot reached the verge of 3000 lines, we began looking for a testing strategy.  The official Github repo didn't contain any sort of tests by default, so the team turned to third-party libraries.
+As the team's script codebase for Hubot verged on 3000 lines of code, we began looking for a testing strategy.  The official Github repo didn't contain any sort of tests by default, so the team turned to third-party libraries.
 
-Our initial interaction with testing came through the library [_](https://github.com).  It appeared to be very in depth, covering a wide range of different scenarios and script types.  However, I was deterred by the complexity of the tests.  Most of our team spends very little time writing CoffeeScript, so I wanted the tests scripts to be as straightforward as possible.
+Our initial interaction with testing came through the library [hubot-mock-adapter](https://github.com/blalor/hubot-mock-adapter).  It appeared to be very in depth, covering a wide range of different scenarios and script types.  However, I was deterred by the complexity of the tests.  Most of our team spends very little time writing CoffeeScript, so I wanted the tests scripts to be as straightforward as possible.
 
-I turned to [mtsmfm](https://github.com/mtsmfm)'s [`hubot-test-helper`](http://github.com/mtsmfm/hubot-test-helper) library.  The library does an impressive job mocking out the basic functionality of the bot while still maintaining simplicity of the test cases.
+I next turned to [mtsmfm](https://github.com/mtsmfm)'s [`hubot-test-helper`](http://github.com/mtsmfm/hubot-test-helper) library.  The library does an impressive job mocking out the basic functionality of the bot while still maintaining simplicity in the test cases.
 
-The rest of this blog post covers some various testing methods as well as some pitfalls I ran across while building the test cases.  If you would prefer to go straight to the code repo, it is available on github with instructions on running the tests: [amussey/hubot-testing-boilerplate](https://github.com/amussey/hubot-testing-boilerplate)
+The rest of this blog post covers some various testing cases as well as a couple pitfalls I ran across while building the tests.  If you would prefer to go straight to the code repo, it is available on Github with instructions on running the tests: [amussey/hubot-testing-boilerplate](https://github.com/amussey/hubot-testing-boilerplate)
 
 
 ## Basic message and response
 
-For the following test, we'll be using part of the [`ping.coffee`][ping].
+This is about as simple as it gets: a user says one thing, Hubot replies with another.  For the following test, we'll be using part of the [`ping.coffee`][ping] script.
 
 ```coffeescript
 module.exports = (robot) ->
@@ -30,7 +30,7 @@ module.exports = (robot) ->
     msg.send "PONG"
 ```
 
-To test this piece of `ping.coffee`, we'll do the following:
+To test this, we'll do the following:
 
 ```coffeescript
 Helper = require('hubot-test-helper')
@@ -79,9 +79,65 @@ When run, the output of this test should appear as follows:
 The full [ping script can be found here][ping], and the full [ping test script can be found here][ping-test].
 
 
+## Private Messages
+
+Inside of [`secret.coffee`][secret], we can see a script with Hubot replying over private message.
+
+```coffeescript
+module.exports = (robot) ->
+  robot.respond /tell me a secret$/i, (msg) ->
+    msg.sendPrivate 'whisper whisper whisper'
+```
+
+We can test that this private message was transmitted in the following way:
+
+```coffeescript
+Helper = require('hubot-test-helper')
+expect = require('chai').expect
+helper = new Helper('./../scripts/secret.coffee')
+
+describe 'secret', ->
+  room = null
+
+  beforeEach ->
+    room = helper.createRoom()
+
+  afterEach ->
+    room.destroy()
+
+  context 'user asks hubot for a secret', ->
+    beforeEach ->
+      room.user.say 'alice', '@hubot tell me a secret'
+
+    it 'should not post to the public channel', ->
+      expect(room.messages).to.eql [
+        ['alice', '@hubot tell me a secret']
+      ]
+
+    it 'should private message user', ->
+      expect(room.privateMessages).to.eql {
+        'alice': [
+          ['hubot', 'whisper whisper whisper']
+        ]
+      }
+```
+
+The naming on the two tests makes them relatively self-explanatory: a check to make sure that Hubot sent back the expected message (through `room.privateMessages`), and a check to make sure that Hubot did not post anything to the public channel.  If it's not apparent in the test above, Hubot stores all of the private messages it sends in `room.privateMessages`.  The array keeps track of each message keyed by the username that the message was sent to.  In this case, we only have the one key (`alice`), since she was the only one to receive a message.
+
+The [`secret.coffee` script][secret] and the [`secret.coffee` test script][secret-test] are available on Github [here][secret] and [here][secret-test], respectively.
+
+```
+
+  private-message
+    user asks hubot for a secret
+      ✓ should not post to the public channel
+      ✓ should private message user
+
+```
+
 ## Updating the Brain
 
-To show interaction with the brain, we'll refer to the [`remember.coffee`][remember] script.  This script adds two commands to hubot: `hubot remember <text>` which stores a provided string in the brain, and `hubot memory`, which will recall that string.
+To show interaction with the brain, we'll refer to the [`remember.coffee` script][remember].  This script adds two commands to Hubot: `hubot remember <text>` which stores a provided string in the brain, and `hubot memory`, which will recall that string.
 
 ```coffeescript
 module.exports = (robot) ->
@@ -134,7 +190,7 @@ describe 'remember', ->
       expect(room.robot.brain.data.memory).to.eql 'this'
 ```
 
-These tests will check two major things: that the correct brain key is being read, and that the value is being set in the correct brain key.
+These tests will check that the correct brain key is being read, and that the value is being set in the correct brain key.
 
 ```
 
@@ -151,7 +207,7 @@ A more complete test suite for this script can be found [here][remember-test].
 
 ## Stubbing an object
 
-When using third party libraries in a script, we'll want to test the functionality of the script without relying on the third party libraries.
+When using third party libraries in a script, we will want to test the functionality of the script without relying on the third party libraries.
 
 A quick and dirty example is set up below using the [Moment.js](http://momentjs.com/) library.
 
@@ -163,6 +219,7 @@ module.exports = (robot) ->
     msg.send moment.unix(msg.match[1]).toString()
 ```
 
+To test this, we'll want to mock out both the `moment.unix()` call (which creates a `moment` object at the input timestamp) and the `moment.unix().toString()` call (which returns the `moment` object in the form of a text string).  That way, regardless of changes to the library (or the timezone of the user), the function will output with consistency.
 
 ```coffeescript
 Helper = require('hubot-test-helper')
@@ -204,8 +261,12 @@ describe 'timestamp', ->
 
     it 'should have called toString', ->
       expect(momentUnixToStringStub.callCount).to.eql 1
+
+    it 'should have called unix() with the correct parameters', ->
+      expect(momentUnixStub.args[0]).to.eql [ '1318781876' ]
 ```
 
+Inside the `beforeEach` block, we create two stubs: one for `moment.unix`, the other for `moment.unix.toString`.  The generated stubs are stored so they can be tested against, be it for call count or the parameters with which they were called.
 
 ```
 
@@ -213,13 +274,16 @@ describe 'timestamp', ->
     user asks hubot to convert
       ✓ should echo message back
       ✓ should have called toString
+      ✓ should have called unix() with the correct parameters
 
 ```
+
+The [timestamp.coffee script][timestamp] can be found on Github [here][timestamp], and the [timestamp.coffee test script][timestamp-test] can be found on Github [here][timestamp-test].
 
 
 ## Mocking the Request object
 
-Occasionally, there will be methods off of Hubot's request object you'll want to mock in your own way.  One of the biggest functions I found myself wanting to mock was the `msg.random` function.  You can see [a simplified version of] the built in script, [shipit.coffee][shipit], using the `msg.random` function below:
+Occasionally, there will be methods off of Hubot's request object you'll want to mock out.  One of the biggest functions I found myself wanting to mock was the `msg.random` function.  You can see a simplified version of the built in script, [shipit.coffee][shipit], using the `msg.random` function below:
 
 
 ```coffeescript
@@ -264,7 +328,7 @@ describe 'shipit', ->
 
 ```
 
-By extending `Helper.Response` into `MockResponse` and redefining the `random` function, we can ensure consistent output of `random` while still maintaining the funcitonality of the rest of `Responses` functions.  This custom `Response` object can then be pushed into our test Hubot when creating the room (`room = helper.createRoom({'response': MockResponse})`).
+By extending `Helper.Response` into `MockResponse` and redefining the `random` function, we can ensure consistent output of `random` while still maintaining the functionality of the rest of `Responses` functions.  This custom `Response` object can then be pushed into our test Hubot when creating the room (`room = helper.createRoom({'response': MockResponse})`).
 
 The rest of the test script for [`shipit.coffee`][shipit] can be found [here][shipit-test].
 
@@ -291,9 +355,7 @@ module.exports = (robot) ->
         msg.send JSON.parse(body).pug
 ```
 
-
 We can mock out the HTTP server on the other end of that request using the following test:
-
 
 ```coffeescript
 Helper = require('hubot-test-helper')
@@ -327,7 +389,6 @@ describe 'pugme', ->
         [ 'hubot', 'http://imgur.com/pug.png' ]
       ]
 ```
-
 
 In this case, the `beforeEach` function has a callback function `done` that will be called after the timeout within the before each is done.  The `setTimeout done, 100` will cause the beforeEach to pause for 100 ms before continuing with the tests.  This will give the mock HTTP responder (and subsequently Hubot) adequate time to respond before the test assertion is run<sup>1</sup>.
 
@@ -363,9 +424,9 @@ The complete [`pugme.coffee`][pugme] script can be referenced [here][pugme], and
 
 ## Common Pitfalls
 
-I ran into a couple big problems while
+### Tearing Down Mocks
 
-If you are working on one test and another appears to randomly start failing, make sure to check that you are tearing things down correctly.
+As noted in the section about **Mock HTTP servers**, make sure that mocks are always torn town.  If you are working on one test and another randomly start failing, make sure that you are tearing things down correctly in the prior tests.
 
 
 #### Environment booleans
@@ -386,6 +447,7 @@ However, because environment variables are stored as strings, the variable the c
 
 ## Conclusion
 
+I hope that this blog post, along with the contents of the [hubot-testing-boilerplate repo](https://github.com/amussey/hubot-testing-boilerplate), help you to build out your test suite.  The above code is by no means perfect, so pull requests are more than welcome.  If you have any additional questions, please leave them in the comment section below!
 
 
 [hubot]: https://github.com/github/hubot
@@ -395,7 +457,11 @@ However, because environment variables are stored as strings, the variable the c
 [ping-test]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/tests/ping.coffee
 [pugme]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/scripts/pugme.coffee
 [pugme-test]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/tests/pugme.coffee
+[secret]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/scripts/secret.coffee
+[secret-test]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/tests/secret.coffee
 [shipit]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/scripts/shipit.coffee
 [shipit-test]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/tests/shipit.coffee
 [remember]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/scripts/remember.coffee
 [remember-test]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/tests/remember.coffee
+[timestamp]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/scripts/timestamp.coffee
+[timestamp-test]: https://github.com/amussey/hubot-testing-boilerplate/blob/master/tests/timestamp.coffee
