@@ -9,6 +9,8 @@ image:      /assets/articles/images/2015-08-11-testing-hubot-scripts/cover.jpg
 ---
 {% include attributes.md %}
 
+**Note: This guide currently works for Hubot versions up to 2.13.2.  There are incompatibilities between the testing library and the `async` module introduced in Hubot version 2.14.0.**
+
 The Cloud Control Panel team uses a fork of [Github's Hubot][hubot] for a large variety of tasks.  Everything from our deployment pipeline to cross team communication is integrated with with our customized version of the IRC bot.
 
 As the team's script codebase for Hubot verged on 3000 lines of code, we began looking for a testing strategy.  The official Github repo didn't contain any sort of tests by default, so the team turned to third-party libraries.
