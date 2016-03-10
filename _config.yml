@@ -1,6 +1,9 @@
 # Build settings
+gems:
+  - jemoji
+  - jekyll-paginate
 markdown: redcarpet
-highlighter: pygments
+# highlighter: pygments
 
 # Site settings
 title: "Andrew Mussey"
