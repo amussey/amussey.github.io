@@ -2,8 +2,8 @@
 gems:
   - jemoji
   - jekyll-paginate
-markdown: redcarpet
-# highlighter: pygments
+markdown: kramdown
+highlighter: rouge
 
 # Site settings
 title: "Andrew Mussey"

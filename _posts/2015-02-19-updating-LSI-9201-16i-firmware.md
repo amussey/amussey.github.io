@@ -11,9 +11,9 @@ image:      /assets/articles/images/2015-02-19-updating-LSI-9201-16i-firmware/IM
 
 After recently upgrading my FreeNAS system to from 8.3 to 9.3, I began receiving alerts about the LSI driver for my SAS controller, the LSI 9201-16i, being out of date:
 
-```
+~~~
 WARNING: Firmware version 5 does not match driver version 16 for /dev/mps0.
-```
+~~~
 
 While attempting to update the card with the UEFI shell, I found the process to be somewhat convoluted.  The following guide details step-by-step how to upgrade the firmware and BIOs on the LSI 9201-16i SAS card using a UEFI shell.
 

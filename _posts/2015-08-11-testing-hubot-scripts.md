@@ -26,15 +26,15 @@ The rest of this blog post covers some various testing cases as well as a couple
 
 This is about as simple as it gets: a user says one thing, Hubot replies with another.  For the following test, we'll be using part of the [`ping.coffee`][ping] script.
 
-```coffeescript
+~~~ coffeescript
 module.exports = (robot) ->
   robot.respond /PING$/i, (msg) ->
     msg.send "PONG"
-```
+~~~
 
 To test this, we'll do the following:
 
-```coffeescript
+~~~ coffeescript
 Helper = require('hubot-test-helper')
 expect = require('chai').expect
 
@@ -64,19 +64,17 @@ describe 'ping', ->
         ['bob',   'hubot PING']
         ['hubot', 'PONG']
       ]
-```
+~~~
 
 As it can be seen above, messages can be sent into the room using the `room.user.say` function.  The entire contents of the room can be read back using `room.messages`.  Each message is returned as a list, with the first element being the name of the user, and the second element being the actual message that they sent.
 
 When run, the output of this test should appear as follows:
 
-```
-
+~~~
   ping
     user says ping to hubot
       ✓ should reply pong to user
-
-```
+~~~
 
 The full [ping script can be found here][ping], and the full [ping test script can be found here][ping-test].
 
@@ -85,15 +83,15 @@ The full [ping script can be found here][ping], and the full [ping test script c
 
 Inside of [`secret.coffee`][secret], we can see a script with Hubot replying over private message.
 
-```coffeescript
+~~~ coffeescript
 module.exports = (robot) ->
   robot.respond /tell me a secret$/i, (msg) ->
     msg.sendPrivate 'whisper whisper whisper'
-```
+~~~
 
 We can test that this private message was transmitted in the following way:
 
-```coffeescript
+~~~ coffeescript
 Helper = require('hubot-test-helper')
 expect = require('chai').expect
 helper = new Helper('./../scripts/secret.coffee')
@@ -122,26 +120,24 @@ describe 'secret', ->
           ['hubot', 'whisper whisper whisper']
         ]
       }
-```
+~~~
 
 The naming on the two tests makes them relatively self-explanatory: a check to make sure that Hubot sent back the expected message (through `room.privateMessages`), and a check to make sure that Hubot did not post anything to the public channel.  If it's not apparent in the test above, Hubot stores all of the private messages it sends in `room.privateMessages`.  The array keeps track of each message keyed by the username that the message was sent to.  In this case, we only have the one key (`alice`), since she was the only one to receive a message.
 
 The [`secret.coffee` script][secret] and the [`secret.coffee` test script][secret-test] are available on Github [here][secret] and [here][secret-test], respectively.
 
-```
-
+~~~
   private-message
     user asks hubot for a secret
       ✓ should not post to the public channel
       ✓ should private message user
-
-```
+~~~
 
 ## Updating the Brain
 
 To show interaction with the brain, we'll refer to the [`remember.coffee` script][remember].  This script adds two commands to Hubot: `hubot remember <text>` which stores a provided string in the brain, and `hubot memory`, which will recall that string.
 
-```coffeescript
+~~~ coffeescript
 module.exports = (robot) ->
   robot.respond /remember (.*)$/i, (msg) ->
     robot.brain.data.memory = msg.match[1]
@@ -155,11 +151,11 @@ module.exports = (robot) ->
       msg.reply 'I\'m not remembering anything.'
     else
       msg.reply robot.brain.data.memory
-```
+~~~
 
 To test the contents of the brain, we can reach it by referencing `room.robot.brain.data.*`.  So, two simple tests could be written as follows:
 
-```coffeescript
+~~~ coffeescript
 Helper = require('hubot-test-helper')
 expect = require('chai').expect
 helper = new Helper('./../scripts/remember.coffee')
@@ -190,19 +186,17 @@ describe 'remember', ->
 
     it 'should have the memory set to "this"', ->
       expect(room.robot.brain.data.memory).to.eql 'this'
-```
+~~~
 
 These tests will check that the correct brain key is being read, and that the value is being set in the correct brain key.
 
-```
-
+~~~
   remember
     user asks Hubot for memory contents
       ✓ should reply with the contents of the memory
     user sets memory and asks for memory contents
       ✓ should have the memory set to "this"
-
-```
+~~~
 
 A more complete test suite for this script can be found [here][remember-test].
 
@@ -213,17 +207,17 @@ When using third party libraries in a script, we will want to test the functiona
 
 A quick and dirty example is set up below using the [Moment.js](http://momentjs.com/) library.
 
-```coffeescript
+~~~ coffeescript
 moment = require('moment')
 
 module.exports = (robot) ->
   robot.respond /convert (.*)$/i, (msg) ->
     msg.send moment.unix(msg.match[1]).toString()
-```
+~~~
 
 To test this, we'll want to mock out both the `moment.unix()` call (which creates a `moment` object at the input timestamp) and the `moment.unix().toString()` call (which returns the `moment` object in the form of a text string).  That way, regardless of changes to the library (or the timezone of the user), the function will output with consistency.
 
-```coffeescript
+~~~ coffeescript
 Helper = require('hubot-test-helper')
 expect = require('chai').expect
 assert = require('chai').assert
@@ -266,19 +260,17 @@ describe 'timestamp', ->
 
     it 'should have called unix() with the correct parameters', ->
       expect(momentUnixStub.args[0]).to.eql [ '1318781876' ]
-```
+~~~
 
 Inside the `beforeEach` block, we create two stubs: one for `moment.unix`, the other for `moment.unix.toString`.  The generated stubs are stored so they can be tested against, be it for call count or the parameters with which they were called.
 
-```
-
+~~~
   timestamp
     user asks hubot to convert
       ✓ should echo message back
       ✓ should have called toString
       ✓ should have called unix() with the correct parameters
-
-```
+~~~
 
 The [timestamp.coffee script][timestamp] can be found on Github [here][timestamp], and the [timestamp.coffee test script][timestamp-test] can be found on Github [here][timestamp-test].
 
@@ -288,7 +280,7 @@ The [timestamp.coffee script][timestamp] can be found on Github [here][timestamp
 Occasionally, there will be methods off of Hubot's request object you'll want to mock out.  One of the biggest functions I found myself wanting to mock was the `msg.random` function.  You can see a simplified version of the built in script, [shipit.coffee][shipit], using the `msg.random` function below:
 
 
-```coffeescript
+~~~ coffeescript
 squirrels = [
   "https://img.skitch.com/20111026-r2wsngtu4jftwxmsytdke6arwd.png",
   "http://i.imgur.com/DPVM1.png",
@@ -298,11 +290,11 @@ squirrels = [
 module.exports = (robot) ->
   robot.hear /ship\s*it/i, (msg) ->
     msg.send msg.random squirrels
-```
+~~~
 
 In order to predictably test that a squirrel is being output, we need to set the `msg.random` to output something consistant.  We can do this by mocking out the request object on the test Hubot.
 
-```coffeescript
+~~~ coffeescript
 Helper = require('hubot-test-helper')
 expect = require('chai').expect
 helper = new Helper('./../scripts/shipit.coffee')
@@ -328,19 +320,17 @@ describe 'shipit', ->
     it 'should respond with an image', ->
       expect(room.messages[1]).to.eql ['hubot', 'http://i.imgur.com/DPVM1.png']
 
-```
+~~~
 
 By extending `Helper.Response` into `MockResponse` and redefining the `random` function, we can ensure consistent output of `random` while still maintaining the functionality of the rest of `Responses` functions.  This custom `Response` object can then be pushed into our test Hubot when creating the room (`room = helper.createRoom({'response': MockResponse})`).
 
 The rest of the test script for [`shipit.coffee`][shipit] can be found [here][shipit-test].
 
-```
-
+~~~
   shipit
     user says "ship it"
       ✓ should respond with an image
-
-```
+~~~
 
 
 ## Mock HTTP servers
@@ -348,18 +338,18 @@ The rest of the test script for [`shipit.coffee`][shipit] can be found [here][sh
 In the event a script wants to communicate with the outside world, we'll have to put an HTTP listener in place in order to mock out that communication.  A simple example is the `pug me` script, [`pugme.coffee`][pugme]:
 
 
-```coffeescript
+~~~ coffeescript
 module.exports = (robot) ->
 
   robot.respond /pug me/i, (msg) ->
     msg.http("http://pugme.herokuapp.com/random")
       .get() (err, res, body) ->
         msg.send JSON.parse(body).pug
-```
+~~~
 
 We can mock out the HTTP server on the other end of that request using the following test:
 
-```coffeescript
+~~~ coffeescript
 Helper = require('hubot-test-helper')
 expect = require('chai').expect
 nock = require('nock')
@@ -390,14 +380,13 @@ describe 'pugme', ->
         [ 'alice', 'hubot pug me' ]
         [ 'hubot', 'http://imgur.com/pug.png' ]
       ]
-```
+~~~
 
 In this case, the `beforeEach` function has a callback function `done` that will be called after the timeout within the before each is done.  The `setTimeout done, 100` will cause the beforeEach to pause for 100 ms before continuing with the tests.  This will give the mock HTTP responder (and subsequently Hubot) adequate time to respond before the test assertion is run<sup>1</sup>.
 
 The `nock` HTTP listeners can also be chained to define multiple endpoints.  For example:
 
-```coffeescript
-
+~~~ coffeescript
   beforeEach ->
     room = helper.createRoom()
     do nock.disableNetConnect
@@ -408,20 +397,17 @@ The `nock` HTTP listeners can also be chained to define multiple endpoints.  For
       .reply 200, { pugs: ['http://imgur.com/pug1.png', 'http://imgur.com/pug2.png'] }
       .get('/count')
       .reply 200, { pug_count: 365 }
-
-```
+~~~
 
 Another important piece to note here are the `nock` listeners being torn down in the `afterEach` block (`nock.cleanAll()`).  Not doing so can result in some odd, unpredictable results.
 
 The complete [`pugme.coffee`][pugme] script can be referenced [here][pugme], and the complete test suite can be found [here][pugme-test].
 
-```
-
+~~~
   pugme
     user asks hubot for a pug
       ✓ should respond with a pug url
-
-```
+~~~
 
 
 ## Common Pitfalls
@@ -435,17 +421,17 @@ As noted in the section about **Mock HTTP servers**, make sure that mocks are al
 
 If you pass a boolean through an environment variable (for example, in the case of the [`shipit.coffee` script][shipit]), keep in mind that the boolean value will be passed through as a string.  While attempting to write tests for [`shipit.coffee`][shipit-test], I ran into trouble setting `process.env.HUBOT_SHIP_EXTRA_SQUIRRELS` to `false`.  The code on lines 40 and 41 originally read:
 
-```coffeescript
+~~~ coffeescript
   if process.env.HUBOT_SHIP_EXTRA_SQUIRRELS
     regex = /ship(ping|z|s|ped)?\s*it/i
-```
+~~~
 
 However, because environment variables are stored as strings, the variable the contained the value `'false'`.  The conditional would then see that, rather than the value being a boolean `false`, it existed as a string, therefore making `if 'false'` to be `true`.  To get around this, I was forced to change to code to read:
 
-```coffeescript
+~~~ coffeescript
   if process.env.HUBOT_SHIP_EXTRA_SQUIRRELS is 'true'
     regex = /ship(ping|z|s|ped)?\s*it/i
-```
+~~~
 
 ## Conclusion
 
