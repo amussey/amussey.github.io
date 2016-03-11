@@ -1,6 +1,6 @@
 # Build settings
-gems:
-  - jekyll-paginate
+# gems:
+#   - jekyll-paginate
 
 # Site settings
 title: "Andrew Mussey"
@@ -17,7 +17,7 @@ name: 'Andrew Mussey'
 author: 'Andrew Mussey'
 author_image: "/assets/images/author.jpg"
 
-paginate: 5
+# paginate: 5
 
 url: "https://amussey.github.io" # the base hostname & protocol for your site
 baseurl: ""
