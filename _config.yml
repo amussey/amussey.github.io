@@ -48,6 +48,13 @@ social:
     share_title:
     share_link:
 
+  - icon: gitlab
+    url:  https://gitlab.com/amussey
+    desc: Fork me on gitlab
+    share_url:
+    share_title:
+    share_link:
+
   - icon:   bitbucket
     url:    https://bitbucket.org/amussey
     desc:   Fork me on Bitbucket
